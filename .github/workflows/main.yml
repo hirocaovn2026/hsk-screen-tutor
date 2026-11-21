@@ -26,15 +26,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
     - name: Ensure Gradle Wrapper and Permissions
       run: |
         mkdir -p gradle/wrapper
         curl -sLo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
         sed -i -e 's/\r$//' gradlew || true
         chmod +x gradlew
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug --no-daemon --stacktrace
