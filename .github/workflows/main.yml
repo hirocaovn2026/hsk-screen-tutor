@@ -16,7 +16,9 @@ jobs:
 
     - name: Unzip project files
       run: |
-        unzip -o HSK_screen_project.zip
+        if [ -f HSK_screen_project.zip ]; then
+          unzip -o HSK_screen_project.zip
+        fi
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -24,11 +26,16 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Grant Execute Permission to gradlew
-      run: chmod +x gradlew
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Fix permissions and line endings
+      run: |
+        sed -i -e 's/\r$//' gradlew || true
+        chmod +x gradlew
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --stacktrace
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
 
     - name: Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
